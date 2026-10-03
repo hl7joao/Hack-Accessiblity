@@ -40,7 +40,15 @@ export function PlanTrip() {
                 <Icon name="elevator" size={16} /> {o.elevatorCount} elevators · {o.legs[0].stops.length} stops
               </p>
               {o.warnings.map((w) => <p key={w} className="warn-text">{w}</p>)}
-              <button className="btn btn-primary" onClick={() => { setTrip(o); navigate('/trip'); }}>
+              {/* Every option's button says "Start this trip", so a screen reader user
+                  tabbing the list would hear the same label repeatedly with no way to
+                  tell a step-free route from one that isn't. The label names the route
+                  and its step-free state; the visible text stays short. */}
+              <button
+                className="btn btn-primary"
+                aria-label={`Start this trip: ${o.summary}, ${o.durationMin} minutes, ${o.stepFree ? 'step-free' : 'not step-free today'}`}
+                onClick={() => { setTrip(o); navigate('/trip'); }}
+              >
                 Start this trip
               </button>
             </article>
