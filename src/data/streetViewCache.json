@@ -1,0 +1,82 @@
+{
+  "elev-40710-street": {
+    "name": "Chicago Ave entrance",
+    "date": "2026-08",
+    "headings": {
+      "180": "/streetview/elev-40710-street-180.jpg",
+      "270": "/streetview/elev-40710-street-270.jpg",
+      "0": "/streetview/elev-40710-street-000.jpg",
+      "90": "/streetview/elev-40710-street-090.jpg"
+    }
+  },
+  "elev-41400-state": {
+    "name": "State St entrance",
+    "date": "2024-09",
+    "headings": {
+      "90": "/streetview/elev-41400-state-090.jpg",
+      "180": "/streetview/elev-41400-state-180.jpg",
+      "270": "/streetview/elev-41400-state-270.jpg",
+      "0": "/streetview/elev-41400-state-000.jpg"
+    }
+  },
+  "elev-41400-wabash": {
+    "name": "Wabash Ave entrance",
+    "date": "2024-08",
+    "headings": {
+      "270": "/streetview/elev-41400-wabash-270.jpg",
+      "0": "/streetview/elev-41400-wabash-000.jpg",
+      "90": "/streetview/elev-41400-wabash-090.jpg",
+      "180": "/streetview/elev-41400-wabash-180.jpg"
+    }
+  },
+  "elev-40230-south-bridge": {
+    "name": "South pedestrian bridge",
+    "date": "2025-12",
+    "headings": {
+      "0": "/streetview/elev-40230-south-bridge-000.jpg",
+      "90": "/streetview/elev-40230-south-bridge-090.jpg",
+      "180": "/streetview/elev-40230-south-bridge-180.jpg",
+      "270": "/streetview/elev-40230-south-bridge-270.jpg"
+    }
+  },
+  "elev-40230-north-bridge": {
+    "name": "North pedestrian bridge",
+    "date": "2025-12",
+    "headings": {
+      "180": "/streetview/elev-40230-north-bridge-180.jpg",
+      "270": "/streetview/elev-40230-north-bridge-270.jpg",
+      "0": "/streetview/elev-40230-north-bridge-000.jpg",
+      "90": "/streetview/elev-40230-north-bridge-090.jpg"
+    }
+  },
+  "elev-40380-street": {
+    "name": "Lake St entrance",
+    "date": "2026-08",
+    "headings": {
+      "180": "/streetview/elev-40380-street-180.jpg",
+      "270": "/streetview/elev-40380-street-270.jpg",
+      "0": "/streetview/elev-40380-street-000.jpg",
+      "90": "/streetview/elev-40380-street-090.jpg"
+    }
+  },
+  "elev-40560-street": {
+    "name": "State St entrance",
+    "date": "2026-08",
+    "headings": {
+      "90": "/streetview/elev-40560-street-090.jpg",
+      "180": "/streetview/elev-40560-street-180.jpg",
+      "270": "/streetview/elev-40560-street-270.jpg",
+      "0": "/streetview/elev-40560-street-000.jpg"
+    }
+  },
+  "elev-41320-street": {
+    "name": "Belmont Ave entrance",
+    "date": "2025-12",
+    "headings": {
+      "270": "/streetview/elev-41320-street-270.jpg",
+      "0": "/streetview/elev-41320-street-000.jpg",
+      "90": "/streetview/elev-41320-street-090.jpg",
+      "180": "/streetview/elev-41320-street-180.jpg"
+    }
+  }
+}

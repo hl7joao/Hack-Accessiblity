@@ -19,7 +19,8 @@ export function StationGuide() {
   // Point the 360 view at the entrance the rider should actually use: the first
   // working street-level elevator. When one is out, this is what changes - and it's
   // the difference between arriving at the right door and arriving at a dead end.
-  const entrance = status?.elevators.find((e) => !e.isOut && e.spec.entrance)?.spec.entrance;
+  const entranceElevator = status?.elevators.find((e) => !e.isOut && e.spec.entrance);
+  const entrance = entranceElevator?.spec.entrance;
 
   return (
     <div className="screen">
@@ -43,6 +44,7 @@ export function StationGuide() {
             lng={entrance.lng}
             heading={entrance.heading}
             description={entrance.name}
+            elevatorId={entranceElevator?.spec.id}
           />
         </section>
       )}

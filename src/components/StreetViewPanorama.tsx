@@ -6,6 +6,7 @@ import {
   streetViewUrl,
   type StreetViewMeta,
 } from '../services/googleMaps';
+import { cachedEntrance, cachedHeadings, cachedViewFor } from '../services/streetViewCache';
 
 /**
  * Drag-to-look-around 360 view of a station entrance.
@@ -24,11 +25,14 @@ export function StreetViewPanorama({
   lng,
   heading = 0,
   description,
+  elevatorId,
 }: {
   lat: number;
   lng: number;
   heading?: number;
   description: string;
+  /** Enables the committed image fallback when live Street View isn't available. */
+  elevatorId?: string;
 }) {
   const [meta, setMeta] = useState<StreetViewMeta | null>(null);
   const [angle, setAngle] = useState(heading);
@@ -56,13 +60,36 @@ export function StreetViewPanorama({
     drag.current = null;
   };
 
-  const nudge = (deg: number) => setAngle((a) => ((a + deg) % 360 + 360) % 360);
+  const nudge = (deg: number) => {
+    // On cached imagery, step to the next angle we actually hold rather than by a
+    // fixed 45 degrees - otherwise a press can leave the picture unchanged.
+    const steps = usingCache && elevatorId ? cachedHeadings(elevatorId) : [];
+    if (steps.length > 0) {
+      const i = steps.indexOf(shownAngle);
+      const next = steps[(i + (deg > 0 ? 1 : steps.length - 1)) % steps.length];
+      setAngle(next);
+      return;
+    }
+    setAngle((a) => ((a + deg) % 360 + 360) % 360);
+  };
 
   const noKey = !hasMapsKey();
   const noCoverage = Boolean(meta && meta.status !== 'OK');
-  const unavailable = noKey || noCoverage;
+  const liveUnavailable = noKey || noCoverage;
 
-  const ageMonths = meta ? imageryAgeMonths(meta) : null;
+  // Fall back to the committed stills so the entrance view still works with no key,
+  // no quota and no network. Live imagery wins when it's available.
+  const cached = elevatorId ? cachedEntrance(elevatorId) : undefined;
+  const cachedView = elevatorId && liveUnavailable ? cachedViewFor(elevatorId, angle) : undefined;
+  const usingCache = Boolean(cachedView);
+  const unavailable = liveUnavailable && !usingCache;
+
+  // On cached imagery the displayed heading is the one we actually have a photo of,
+  // so the compass label and alt text never describe a view that isn't on screen.
+  const shownAngle = cachedView ? cachedView.actualHeading : angle;
+
+  const ageMonths = meta ? imageryAgeMonths(meta) : cached?.date ? imageryAgeMonths({ status: 'OK', date: cached.date }) : null;
+  const displayDate = meta?.date ?? cached?.date;
   const stale = ageMonths != null && ageMonths > 24;
 
   return (
@@ -83,6 +110,12 @@ export function StreetViewPanorama({
                 : 'Google has no Street View coverage at this entrance.'}
             </small>
           </div>
+        ) : usingCache ? (
+          <img
+            src={cachedView!.src}
+            alt={`Street view of ${description}, looking ${compass(shownAngle)}`}
+            draggable={false}
+          />
         ) : meta ? (
           <img
             src={streetViewUrl({ lat, lng, heading: angle, width: 640, height: 360, fov: 90 })}
@@ -104,7 +137,7 @@ export function StreetViewPanorama({
           ← Look left
         </button>
         <span className="pano-heading" aria-live="polite">
-          {unavailable ? 'View unavailable' : `Facing ${compass(angle)}`}
+          {unavailable ? 'View unavailable' : `Facing ${compass(shownAngle)}`}
         </span>
         <button type="button" className="btn btn-sm" onClick={() => nudge(45)} disabled={unavailable}>
           Look right →
@@ -113,11 +146,12 @@ export function StreetViewPanorama({
 
       <figcaption>
         {description}
-        {meta?.date && (
+        {displayDate && (
           <span className={stale ? 'pano-stale' : 'pano-date'}>
             {' '}
-            · Imagery from {formatMonth(meta.date)}
+            · Imagery from {formatMonth(displayDate)}
             {stale && ' — may be out of date'}
+            {usingCache && ' (saved copy)'}
           </span>
         )}
       </figcaption>
