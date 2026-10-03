@@ -41,6 +41,7 @@ export function AppShell() {
   return (
     <div className="shell">
       <a className="skip-link" href="#main">Skip to content</a>
+      <OfflineBanner />
       {/* Names the screen after each navigation; visually hidden. */}
       <p className="sr-only" aria-live="polite" role="status">{announcement}</p>
       <main id="main" className="main" tabIndex={-1} ref={main}>
@@ -55,6 +56,36 @@ export function AppShell() {
         ))}
       </nav>
     </div>
+  );
+}
+
+/**
+ * Tells the rider when they're offline, because everything below may be stale.
+ *
+ * Stated plainly rather than hidden: a wheelchair user acting on a cached
+ * "elevator working" can end up stranded, so they need to know the data is old
+ * and worth re-checking at the station.
+ */
+function OfflineBanner() {
+  const [offline, setOffline] = useState(!navigator.onLine);
+
+  useEffect(() => {
+    const on = () => setOffline(false);
+    const off = () => setOffline(true);
+    window.addEventListener('online', on);
+    window.addEventListener('offline', off);
+    return () => {
+      window.removeEventListener('online', on);
+      window.removeEventListener('offline', off);
+    };
+  }, []);
+
+  if (!offline) return null;
+  return (
+    <p className="offline-banner" role="status">
+      <Icon name="alert" size={18} />
+      You're offline. Elevator status may be out of date — check the signs at the station.
+    </p>
   );
 }
 

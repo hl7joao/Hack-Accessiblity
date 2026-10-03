@@ -570,3 +570,19 @@ select { min-height: 44px; padding: 0 10px; border-radius: 10px; border: 1px sol
 .dest-warning > .planb-head { display: flex; align-items: center; gap: 0.5rem; color: var(--danger); margin-bottom: 0.4rem; }
 .dest-warning > p { margin: 0 0 0.8rem; }
 .dest-warning .planb { margin-bottom: 0; background: var(--surface); }
+
+/* Offline notice. Sits above everything because it qualifies all of it: if the
+   rider is acting on cached elevator status, they need to know before they trust it. */
+.offline-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0.6rem 1rem;
+  background: var(--warn-bg);
+  color: var(--warn);
+  font-size: calc(0.9rem * var(--font-scale, 1));
+  font-weight: 600;
+  border-bottom: 2px solid var(--warn);
+}
+.offline-banner svg { flex-shrink: 0; }

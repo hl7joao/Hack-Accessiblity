@@ -10,10 +10,30 @@ const delay = (ms = 250) => new Promise((r) => setTimeout(r, ms));
 /** CTA returns a single object when there's one result and an array otherwise. */
 const asList = <T>(x: T | T[] | undefined | null): T[] => (x == null ? [] : Array.isArray(x) ? x : [x]);
 
+/** True when the last response came from the offline cache rather than the network. */
+export let servedOffline = false;
+
 async function getJson<T>(url: string): Promise<T> {
   const res = await fetch(url);
+  // 503 with an `offline` flag is the service worker telling us it had no network
+  // and nothing cached. Surface it rather than treating it as a CTA failure.
+  if (res.status === 503) {
+    const body = await res.json().catch(() => null);
+    if (body?.offline) {
+      servedOffline = true;
+      throw new OfflineError();
+    }
+  }
   if (!res.ok) throw new Error(`CTA request failed: ${res.status}`);
+  servedOffline = false;
   return res.json() as Promise<T>;
+}
+
+export class OfflineError extends Error {
+  constructor() {
+    super('No network and no cached CTA data');
+    this.name = 'OfflineError';
+  }
 }
 
 /* ---------- Customer Alerts: routes.aspx ----------
