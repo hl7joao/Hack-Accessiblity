@@ -472,3 +472,89 @@ select { min-height: 44px; padding: 0 10px; border-radius: 10px; border: 1px sol
    feedback, and a box around the whole page reads as a rendering glitch. Real
    keyboard focus still shows via :focus-visible everywhere else. */
 .main:focus { outline: none; }
+
+/* ---------- Plan B: where to go instead ---------- */
+
+.planb {
+  border: 2px solid var(--ok);
+  border-radius: var(--radius);
+  padding: 1rem;
+  margin-bottom: 1rem;
+  background: var(--surface);
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+/* Green, not red: this card is the way out, not another warning. The verdict
+   above it already carries the bad news. */
+.planb-empty { border-color: var(--warn); }
+
+.planb-label {
+  margin: 0;
+  font-size: calc(0.75rem * var(--font-scale, 1));
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.planb-head {
+  margin: 0;
+  font-size: calc(1.25rem * var(--font-scale, 1));
+  line-height: 1.25;
+}
+.planb-empty .planb-head {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: calc(1.05rem * var(--font-scale, 1));
+  color: var(--warn);
+}
+
+.planb-pill { align-self: flex-start; margin: 0; }
+.planb-meta { margin: 0; color: var(--muted); font-size: calc(0.9rem * var(--font-scale, 1)); }
+.planb-caveat { margin: 0; font-size: calc(0.9rem * var(--font-scale, 1)); }
+
+.planb .btn { width: 100%; }
+
+.planb-more { margin-top: 0.2rem; }
+.planb-more summary {
+  cursor: pointer;
+  padding: 0.5rem 0;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  font-size: calc(0.9rem * var(--font-scale, 1));
+}
+
+.planb-list { list-style: none; margin: 0.3rem 0 0; padding: 0; }
+.planb-alt {
+  width: 100%;
+  min-height: 44px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.15rem;
+  padding: 0.6rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+  margin-bottom: 0.4rem;
+  color: inherit;
+}
+.planb-alt:hover { background: var(--ok-bg); }
+
+/* Destination warning wraps its own Plan B, so the rider sees the problem and the
+   alternative together rather than having to connect them. */
+.dest-warning {
+  border: 2px solid var(--danger);
+  border-radius: var(--radius);
+  padding: 1rem;
+  margin-bottom: 1rem;
+  background: var(--danger-bg);
+}
+.dest-warning > .planb-head { display: flex; align-items: center; gap: 0.5rem; color: var(--danger); margin-bottom: 0.4rem; }
+.dest-warning > p { margin: 0 0 0.8rem; }
+.dest-warning .planb { margin-bottom: 0; background: var(--surface); }

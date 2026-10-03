@@ -120,7 +120,9 @@ export const MOCK_ALERTS: ServiceAlert[] = [
   {
     id: 'a1',
     headline: 'Elevator at Belmont temporarily out of service',
-    shortDescription: 'The elevator between the mezzanine and Belmont Ave is out of service. Use Fullerton or Addison for step-free access.',
+    // Phrased the way CTA actually words these, so the registry's matchers bind it
+    // to elev-41320-street and the resolver can judge the station's step-free path.
+    shortDescription: 'The elevator to/from street at Belmont (Red, Brown, Purple Lines) is temporarily out-of-service.',
     impact: 'Elevator Status',
     severity: 'accessibility',
     lines: ['Red', 'Brn', 'P'],
