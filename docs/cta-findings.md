@@ -191,3 +191,40 @@ Check it, but **do not assume it carries elevator data.**
 
 `accessibility=false` dropped the result count 45 → 42, removing **exactly** the 3
 elevator alerts. Clean filter.
+
+## The elevator naming problem, concretely
+
+Three live alerts, three *different* naming conventions — this is why prose parsing fails:
+
+| Alert text | Names the elevator by |
+|---|---|
+| "the **Kimball- and Linden-bound platform** elevator" | direction served |
+| "the elevator **to/from State Street**" | street |
+| "the elevator **to/from street at the south pedestrian bridge**" | structure |
+
+CTA operates ~162-173 elevators. **None is individually addressable in any public feed.**
+Any ID scheme we build is our own invention, unverifiable against a CTA source — which
+is worth stating plainly rather than implying authority we don't have.
+
+## Best one-line framing of the problem
+
+From the GTFS-realtime mailing list, on service-alert workarounds:
+**"Both do not affect pedestrian routing."**
+
+Alerts notify humans. They do not let a router avoid a broken elevator. That distinction
+is the whole project.
+
+## Precedent: someone tried and it died
+
+`sozialhelden/facilities-gtfs-rt-feed` — Berlin elevators → GTFS-RT, built specifically
+against google/transit#268. **Last push 2022-05-22, 7 stars.** Worth citing: this is a
+known-hard problem, not an oversight.
+
+## Day-one checklist
+
+1. **Request a beta GTFS-RT portal key and inspect ServiceAlerts** — the one unknown that
+   could change the plan. Register at transitchicago.com/developers/traintrackerapply/
+2. **Start polling `alerts.aspx` into storage immediately** — no backfill exists.
+3. **Open Google Maps against a live outage** to confirm the gap first-hand. Roosevelt,
+   Cumberland, and Chicago/Brown-Purple are all out right now — ready-made test cases.
+   (The GTFS finding is airtight regardless; this is for the pitch, not the premise.)
