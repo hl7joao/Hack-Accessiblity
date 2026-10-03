@@ -63,6 +63,10 @@ export function Settings() {
             </fieldset>
           )}
           <Toggle label="Vibrate" checked={prefs.vibrate} onChange={(v) => update({ vibrate: v })} />
+          <p className="muted small">
+            iPhones don't let websites vibrate the phone — on iPhone you'll feel the
+            notification's own buzz instead. Android vibrates with our full pattern.
+          </p>
           <label className="list-row">
             <span className="row-title">Warn me before my stop</span>
             <select value={prefs.alertStopsBefore} onChange={(e) => update({ alertStopsBefore: Number(e.target.value) })}>

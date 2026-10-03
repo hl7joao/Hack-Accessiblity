@@ -72,7 +72,14 @@ export function alertRider(title: string, body: string, opts: { vibrate?: boolea
 
 function showNotification(title: string, body: string) {
   if (!('Notification' in window) || Notification.permission !== 'granted') return;
-  const options = { body, tag: 'stepfree-trip' };
+  // Android honours a vibration pattern on the notification itself - it buzzes even
+  // with the app in the background. iOS ignores the field and uses its own system
+  // haptic; there is no web API to vibrate an iPhone directly, from any code path.
+  const options: NotificationOptions & { vibrate?: number[] } = {
+    body,
+    tag: 'stepfree-trip',
+    vibrate: [300, 120, 300, 120, 600],
+  };
   const fallback = () => {
     try {
       new Notification(title, options);
