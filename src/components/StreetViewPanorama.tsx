@@ -58,29 +58,9 @@ export function StreetViewPanorama({
 
   const nudge = (deg: number) => setAngle((a) => ((a + deg) % 360 + 360) % 360);
 
-  if (!hasMapsKey()) {
-    return (
-      <figure className="pano">
-        <div className="map-placeholder">
-          <span>360° entrance view</span>
-          <small>Add VITE_GOOGLE_MAPS_API_KEY to enable</small>
-        </div>
-        <figcaption>{description}</figcaption>
-      </figure>
-    );
-  }
-
-  if (meta && meta.status !== 'OK') {
-    return (
-      <figure className="pano">
-        <div className="map-placeholder">
-          <span>No street imagery here</span>
-          <small>Google has no Street View coverage at this entrance.</small>
-        </div>
-        <figcaption>{description}</figcaption>
-      </figure>
-    );
-  }
+  const noKey = !hasMapsKey();
+  const noCoverage = Boolean(meta && meta.status !== 'OK');
+  const unavailable = noKey || noCoverage;
 
   const ageMonths = meta ? imageryAgeMonths(meta) : null;
   const stale = ageMonths != null && ageMonths > 24;
@@ -89,12 +69,21 @@ export function StreetViewPanorama({
     <figure className="pano">
       <div
         className="pano-frame"
-        onPointerDown={onPointerDown}
-        onPointerMove={onPointerMove}
-        onPointerUp={onPointerUp}
-        onPointerCancel={onPointerUp}
+        onPointerDown={unavailable ? undefined : onPointerDown}
+        onPointerMove={unavailable ? undefined : onPointerMove}
+        onPointerUp={unavailable ? undefined : onPointerUp}
+        onPointerCancel={unavailable ? undefined : onPointerUp}
       >
-        {meta ? (
+        {unavailable ? (
+          <div className="map-placeholder">
+            <span>{noKey ? '360° entrance view' : 'No street imagery here'}</span>
+            <small>
+              {noKey
+                ? 'Add VITE_GOOGLE_MAPS_API_KEY to enable'
+                : 'Google has no Street View coverage at this entrance.'}
+            </small>
+          </div>
+        ) : meta ? (
           <img
             src={streetViewUrl({ lat, lng, heading: angle, width: 640, height: 360, fov: 90 })}
             alt={`Street view of ${description}, looking ${compass(angle)}`}
@@ -107,15 +96,17 @@ export function StreetViewPanorama({
         )}
       </div>
 
-      {/* Keyboard and screen-reader path: dragging is not the only way to turn. */}
+      {/* Keyboard and screen-reader path: dragging is never the only way to turn.
+          Disabled rather than removed when there's no imagery, so the control set
+          doesn't appear and disappear between stations. */}
       <div className="pano-controls">
-        <button type="button" className="btn btn-sm" onClick={() => nudge(-45)}>
+        <button type="button" className="btn btn-sm" onClick={() => nudge(-45)} disabled={unavailable}>
           ← Look left
         </button>
         <span className="pano-heading" aria-live="polite">
-          Facing {compass(angle)}
+          {unavailable ? 'View unavailable' : `Facing ${compass(angle)}`}
         </span>
-        <button type="button" className="btn btn-sm" onClick={() => nudge(45)}>
+        <button type="button" className="btn btn-sm" onClick={() => nudge(45)} disabled={unavailable}>
           Look right →
         </button>
       </div>

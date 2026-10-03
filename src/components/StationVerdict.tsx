@@ -1,5 +1,4 @@
 import type { StationStatus, StationVerdict } from '../services/stationStatus';
-import { StreetViewPreview } from './StreetViewPreview';
 import { Icon } from './Icon';
 
 const ICON: Record<StationVerdict, 'check' | 'alert' | 'x'> = {
@@ -84,13 +83,6 @@ export function StationVerdictCard({ status }: { status: StationStatus }) {
               </li>
             ))}
           </ul>
-          {/* Show the way in for the first working street entrance — the one they should head to. */}
-          {working.find((e) => e.spec.entrance)?.spec.entrance && (
-            <StreetViewPreview
-              {...working.find((e) => e.spec.entrance)!.spec.entrance!}
-              description={`${working.find((e) => e.spec.entrance)!.spec.entrance!.name} — use this entrance`}
-            />
-          )}
         </>
       )}
 

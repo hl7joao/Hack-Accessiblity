@@ -374,10 +374,20 @@ select { min-height: 44px; padding: 0 10px; border-radius: 10px; border: 1px sol
   padding: 0.5rem 0;
 }
 .pano-heading {
+  flex: 1;
+  text-align: center;
   font-size: calc(0.9rem * var(--font-scale, 1));
   color: var(--muted);
   text-transform: capitalize;
+  /* Keep the label on one line so it doesn't squeeze the buttons at large
+     text sizes; it's announced via aria-live regardless of how it wraps. */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
+
+.pano-controls .btn-sm { flex: 0 0 auto; }
+.pano-controls .btn-sm:disabled { opacity: 0.55; cursor: not-allowed; }
 
 .btn-sm {
   padding: 0.4rem 0.7rem;
