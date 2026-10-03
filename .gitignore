@@ -12,3 +12,4 @@ coverage/
 .playwright-mcp/
 el.html
 .vercel
+.env*
