@@ -102,3 +102,41 @@ May 2025. Validates the concept, proves nobody shipped it.
   elevator monitor. Don't pitch as if CTA is doing nothing.
 - No recent (2024-2026) lawsuit against CTA on accessibility was found. The landmark
   is Access Living v. CTA, settled 2001. Don't claim active litigation.
+
+## Implementation gotchas (second verification pass)
+
+- **Use `alerts.aspx`, NEVER `routes.aspx`** for accessibility. Across all 191 station
+  entries, `RouteStatus` values were only: Normal Service (111), Service Change (33),
+  Planned Work w/Bypass (31), Major Delays (16). **"Elevator Status" never appears.**
+- **Single-result queries return an OBJECT, multi-result a LIST.** Handle both — this
+  crashed the researcher's script.
+- `FullDescription` is HTML inside CDATA — sanitize before rendering.
+- Docs say `http://`; use `https://`. Both work.
+- **Join key:** Alerts `ServiceId` = GTFS **parent** station ID (`4xxxx`).
+  Platform stops are `3xxxx`.
+- `type` and `stationid` are mutually exclusive on routes.aspx (verified error).
+- **Poll immediately and store.** No backfill exists; every hour not polling is lost data.
+
+## Severity bands
+
+1-19 accessibility/informational (elevator = 5) · 20-39 planned · 40-59 minor ·
+60-79 significant · 80-99 major.
+
+Note: elevator alerts are all `special-note`/severity 5 **regardless of planned status**,
+so planned-vs-unplanned is NOT a clean boolean for elevators specifically.
+
+## Also unavailable
+
+- **Escalators.** Zero escalator alerts exist, despite CTA running 176 escalators with
+  *worse* uptime (90.9-97.4%) than elevators. Matters for ambulatory disabled riders.
+- **Repair ETAs.** Every observed alert: `EventEnd: null`, `TBD: 1`. Always "TBD."
+- **Rail crowding.** `psgld` is bus-only; no rail equivalent.
+- **Broken bus ramps** — a documented stranding cause, exposed nowhere.
+
+## Station count: pick one source
+
+CTA says 110/146 accessible. GTFS says 108/143. Not staleness — the 3-station gap is
+stations closed for reconstruction, excluded from the active feed. **State which you use.**
+
+The city portal (`8pix-ypme`) is STALE: it flags Austin Green (41260) and Racine Blue
+(40470) as `ada: false` though both are completed ASAP projects. **Prefer GTFS.**
