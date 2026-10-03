@@ -425,3 +425,10 @@ select { min-height: 44px; padding: 0 10px; border-radius: 10px; border: 1px sol
   color: var(--muted);
   font-style: italic;
 }
+
+/* A screen with a fixed action bar needs room to scroll clear of it, or the last
+   steps sit underneath the button and the tab bar. Reserve the height of both,
+   plus the gradient, plus the safe-area inset on notched phones. */
+.screen:has(.sticky-actions) {
+  padding-bottom: calc(var(--tabbar-h) + 88px + env(safe-area-inset-bottom));
+}
