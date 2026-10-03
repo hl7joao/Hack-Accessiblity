@@ -8,7 +8,7 @@ import { formatClock, minutesUntil, useNow } from '../components/hooks';
 import { usePreferences } from '../context/Preferences';
 import { useTrip } from '../context/Trip';
 import { fetchArrivals } from '../services/cta';
-import { alertRider, requestNotificationPermission } from '../services/notify';
+import { alertRider, requestNotificationPermission, speakText, stopSpeaking } from '../services/notify';
 import type { Arrival } from '../types';
 import { NoTrip } from './NoTrip';
 
@@ -34,10 +34,23 @@ export function Platform() {
   const mins = next ? minutesUntil(next.arrivalTime, now) : null;
 
   useEffect(() => {
+    if (!prefs.announceAloud || !next || mins == null) {
+      stopSpeaking();
+      return;
+    }
+
+    const announcement = mins === 0
+      ? `Next ${leg?.toward}-bound train is due now.`
+      : `Next ${leg?.toward}-bound train in ${mins} minute${mins === 1 ? '' : 's'}.`;
+    speakText(announcement, prefs.voicePace);
+    return stopSpeaking;
+  }, [leg?.toward, mins, next?.runNumber, prefs.announceAloud, prefs.voicePace]);
+
+  useEffect(() => {
     if (!watching || !next || notified.current) return;
     if (next.isApproaching || (mins ?? 99) <= 1) {
       notified.current = true;
-      alertRider(`Your ${next.line} Line train is arriving`, `${next.destination}-bound. ${leg?.boardingTip ?? ''}`, { vibrate: prefs.vibrate, speak: prefs.announceAloud });
+      alertRider(`Your ${next.line} Line train is arriving`, `${next.destination}-bound. ${leg?.boardingTip ?? ''}`, { vibrate: prefs.vibrate });
     }
   }, [watching, next, mins, leg, prefs]);
 

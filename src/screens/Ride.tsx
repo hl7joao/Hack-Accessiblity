@@ -33,7 +33,7 @@ export function Ride() {
     const say = (key: string, title: string, body: string) => {
       if (alerted.current.has(key)) return;
       alerted.current.add(key);
-      alertRider(title, body, { vibrate: prefs.vibrate, speak: prefs.announceAloud });
+      alertRider(title, body, { vibrate: prefs.vibrate, speak: prefs.announceAloud, pace: prefs.voicePace });
     };
     if (remaining === prefs.alertStopsBefore && remaining > 0) {
       say('soon', `${leg.to.name} is ${remaining === 1 ? 'the next stop' : `in ${remaining} stops`}`, 'Get ready to exit. Doors open on the right.');

@@ -1,4 +1,5 @@
 export type LineId = 'Red' | 'Blue' | 'Brn' | 'G' | 'Org' | 'P' | 'Pink' | 'Y';
+export type VoicePace = 'slow' | 'normal' | 'fast';
 
 export interface Line {
   id: LineId;
@@ -93,6 +94,7 @@ export interface Preferences {
   textSize: 'default' | 'large' | 'xlarge';
   highContrast: boolean;
   announceAloud: boolean;
+  voicePace: VoicePace;
   vibrate: boolean;
   /** Alert this many stops before your destination */
   alertStopsBefore: number;

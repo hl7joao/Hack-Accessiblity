@@ -43,9 +43,25 @@ export function Settings() {
       </section>
 
       <section aria-labelledby="alert-h">
-        <h2 id="alert-h" className="section-title">Arrival alerts</h2>
+        <h2 id="alert-h" className="section-title">Voice and arrival alerts</h2>
         <div className="list card">
-          <Toggle label="Speak alerts aloud" checked={prefs.announceAloud} onChange={(v) => update({ announceAloud: v })} />
+          <Toggle label="Speak directions and alerts aloud" checked={prefs.announceAloud} onChange={(v) => update({ announceAloud: v })} />
+          {prefs.announceAloud && (
+            <fieldset className="card chips">
+              <legend>Voice pace</legend>
+              {(['slow', 'normal', 'fast'] as const).map((pace) => (
+                <label key={pace} className="chip">
+                  <input
+                    type="radio"
+                    name="voicePace"
+                    checked={prefs.voicePace === pace}
+                    onChange={() => update({ voicePace: pace })}
+                  />
+                  {pace[0].toUpperCase() + pace.slice(1)}
+                </label>
+              ))}
+            </fieldset>
+          )}
           <Toggle label="Vibrate" checked={prefs.vibrate} onChange={(v) => update({ vibrate: v })} />
           <label className="list-row">
             <span className="row-title">Warn me before my stop</span>

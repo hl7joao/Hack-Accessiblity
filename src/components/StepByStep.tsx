@@ -1,4 +1,6 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { usePreferences } from '../context/Preferences';
+import { speakText, stopSpeaking } from '../services/notify';
 import type { RouteStep } from '../types';
 import { Icon } from './Icon';
 import { STEP_ICON, StepDetails } from './StepList';
@@ -19,12 +21,29 @@ export interface StepGroup {
  */
 export function StepByStep({ groups }: { groups: StepGroup[] }) {
   const [index, setIndex] = useState(0);
+  const { prefs } = usePreferences();
   const steps = groups.flatMap((g) => g.steps.map((step) => ({ step, group: g.title })));
-  if (steps.length === 0) return null;
 
   // Clamp in case the step list shrinks underneath us (e.g. elevator status loads late).
-  const current = Math.min(index, steps.length - 1);
-  const { step, group } = steps[current];
+  const current = Math.min(index, Math.max(steps.length - 1, 0));
+  const currentStep = steps[current];
+
+  useEffect(() => {
+    if (!prefs.announceAloud || !currentStep) {
+      stopSpeaking();
+      return;
+    }
+
+    const instruction = [currentStep.step.title, currentStep.step.detail]
+      .filter(Boolean)
+      .join('. ');
+    speakText(instruction, prefs.voicePace);
+    return stopSpeaking;
+  }, [current, currentStep?.step.id, currentStep?.step.title, currentStep?.step.detail, prefs.announceAloud, prefs.voicePace]);
+
+  if (!currentStep) return null;
+
+  const { step, group } = currentStep;
   const isFirst = current === 0;
   const isLast = current === steps.length - 1;
 

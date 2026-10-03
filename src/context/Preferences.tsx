@@ -8,6 +8,7 @@ const DEFAULTS: Preferences = {
   textSize: 'default',
   highContrast: false,
   announceAloud: true,
+  voicePace: 'normal',
   vibrate: true,
   alertStopsBefore: 1,
 };
