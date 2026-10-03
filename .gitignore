@@ -10,3 +10,4 @@ coverage/
 .pnpm-store/
 *.tsbuildinfo
 .playwright-mcp/
+el.html
