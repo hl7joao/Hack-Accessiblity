@@ -36,6 +36,8 @@ export function StationGuide() {
     lat: p.lat,
     lng: p.lng,
     heading: p.heading,
+    // The waypoint at the door itself can fall back to the saved entrance photo.
+    cachedViewId: entrance && p.lat === entrance.lat && p.lng === entrance.lng ? entranceElevator?.spec.id : undefined,
   }));
 
   // When the station can't be used, lead with somewhere that can be.

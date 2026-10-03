@@ -23,7 +23,7 @@ export function StepDetails({ step, showPreview = true }: { step: RouteStep; sho
         </div>
       )}
       {showPreview && step.lat != null && step.lng != null && (
-        <StreetViewPreview lat={step.lat} lng={step.lng} heading={step.heading} description={step.title} />
+        <StreetViewPreview lat={step.lat} lng={step.lng} heading={step.heading} description={step.title} cachedViewId={step.cachedViewId} />
       )}
     </>
   );

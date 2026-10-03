@@ -81,7 +81,7 @@ export const TRIP_OPTIONS: TripOption[] = [
 ];
 
 const ORIGIN_STEPS: TripOption['originSteps'] = [
-  { id: 'o1', kind: 'enter', title: 'Enter at State St & Roosevelt Rd', detail: 'Northeast corner, glass elevator building. Automatic door on the left.', lat: 41.86745, lng: -87.62705, heading: 270 },
+  { id: 'o1', kind: 'enter', title: 'Enter at State St & Roosevelt Rd', detail: 'Northeast corner, glass elevator building. Automatic door on the left.', lat: 41.86745, lng: -87.62705, heading: 270, cachedViewId: 'elev-41400-state' },
   { id: 'o2', kind: 'elevator', title: 'Take elevator down to mezzanine', elevatorId: 'roos-street' },
   { id: 'o3', kind: 'fare', title: 'Use the wide accessible fare gate', detail: 'Far right gate. Tap Ventra card or phone on the reader at seat height.' },
   { id: 'o4', kind: 'walk', title: 'Follow the red signs 40 ft ahead', detail: 'Level floor, tactile strip guides you to the elevator.' },

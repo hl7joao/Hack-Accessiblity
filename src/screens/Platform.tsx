@@ -7,10 +7,14 @@ import { TripProgress } from '../components/TripProgress';
 import { formatClock, minutesUntil, useNow } from '../components/hooks';
 import { usePreferences } from '../context/Preferences';
 import { useTrip } from '../context/Trip';
+import { LINES } from '../data/lines';
 import { fetchArrivals } from '../services/cta';
-import { alertRider, requestNotificationPermission, speakText, stopSpeaking } from '../services/notify';
+import { alertRider, primeSpeech, requestNotificationPermission, speakText, stopSpeaking } from '../services/notify';
 import type { Arrival } from '../types';
 import { NoTrip } from './NoTrip';
+
+/** How long after the alert is turned on before the demo arrival alert fires. */
+const DEMO_ALERT_DELAY_MS = 5_000;
 
 export function Platform() {
   const { trip } = useTrip();
@@ -20,6 +24,7 @@ export function Platform() {
   const [arrivals, setArrivals] = useState<Arrival[] | null>(null);
   const [watching, setWatching] = useState(false);
   const notified = useRef(false);
+  const [arrivalAlert, setArrivalAlert] = useState<{ title: string; body: string } | null>(null);
   const leg = trip?.legs[0];
 
   useEffect(() => {
@@ -32,6 +37,17 @@ export function Platform() {
 
   const next = arrivals?.[0];
   const mins = next ? minutesUntil(next.arrivalTime, now) : null;
+
+  // Show the in-app alert as well as the system one: notifications may be blocked or
+  // silenced, and the banner is what the rider sees while looking at the screen.
+  const fireArrivalAlert = () => {
+    if (notified.current || !leg) return;
+    notified.current = true;
+    const title = `Your ${LINES[leg.line].name} train is arriving`;
+    const body = `${leg.toward}-bound. ${leg.boardingTip ?? ''}`.trim();
+    setArrivalAlert({ title, body });
+    alertRider(title, body, { vibrate: prefs.vibrate, speak: prefs.announceAloud, pace: prefs.voicePace });
+  };
 
   useEffect(() => {
     if (!prefs.announceAloud || !next || mins == null) {
@@ -48,17 +64,38 @@ export function Platform() {
 
   useEffect(() => {
     if (!watching || !next || notified.current) return;
-    if (next.isApproaching || (mins ?? 99) <= 1) {
-      notified.current = true;
-      alertRider(`Your ${next.line} Line train is arriving`, `${next.destination}-bound. ${leg?.boardingTip ?? ''}`, { vibrate: prefs.vibrate });
-    }
-  }, [watching, next, mins, leg, prefs]);
+    if (next.isApproaching || (mins ?? 99) <= 1) fireArrivalAlert();
+  });
+
+  // Demo: once the alert is on, announce an arriving train after a short delay so the
+  // flow can be shown without waiting for a real train.
+  useEffect(() => {
+    if (!watching) return;
+    const t = setTimeout(fireArrivalAlert, DEMO_ALERT_DELAY_MS);
+    return () => clearTimeout(t);
+  }, [watching]);
 
   if (!trip || !leg) return <NoTrip />;
 
   return (
     <div className="screen">
       <ScreenHeader title="On the platform" subtitle={leg.platform} />
+
+      {/* role="alert" announces without moving focus, so the rider doesn't lose their place. */}
+      <div className="arrival-alert-region" role="alert">
+        {arrivalAlert && (
+          <div className="arrival-alert">
+            <Icon name="train" size={28} />
+            <div className="arrival-alert-text">
+              <p className="arrival-alert-title">{arrivalAlert.title}</p>
+              {arrivalAlert.body && <p>{arrivalAlert.body}</p>}
+            </div>
+            <button className="btn btn-secondary arrival-alert-dismiss" onClick={() => setArrivalAlert(null)}>
+              Dismiss
+            </button>
+          </div>
+        )}
+      </div>
       <TripProgress stage={1} />
 
       <section className="card next-train" aria-labelledby="next-h" aria-live="polite">
@@ -88,7 +125,18 @@ export function Platform() {
       <button
         className={`btn ${watching ? 'btn-secondary' : 'btn-primary'}`}
         aria-pressed={watching}
-        onClick={async () => { if (!watching) await requestNotificationPermission(); notified.current = false; setWatching(!watching); }}
+        onClick={() => {
+          // Everything here stays synchronous: iOS only unlocks speech inside the tap
+          // itself, and an awaited permission prompt that never settles must not stop
+          // the alert from turning on.
+          if (!watching) {
+            if (prefs.announceAloud) primeSpeech();
+            void requestNotificationPermission();
+          }
+          notified.current = false;
+          setArrivalAlert(null);
+          setWatching(!watching);
+        }}
       >
         <Icon name="bell" /> {watching ? 'Alert is on — tap to cancel' : 'Alert me when my train arrives'}
       </button>

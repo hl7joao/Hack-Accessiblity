@@ -257,6 +257,11 @@ svg { flex-shrink: 0; vertical-align: middle; }
 .stop-line .here .stop-dot { width: 26px; height: 26px; margin-left: -3px; background: var(--primary); border-color: var(--primary); box-shadow: 0 0 0 5px var(--access-bg); }
 .stop-line .here .stop-name, .stop-line .dest .stop-name { font-weight: 800; }
 .stop-name { flex: 1; }
+/* A collapsed stretch of the route: the line carries on, dashed, so it still reads as one line. */
+.stop-line .gap { min-height: 36px; padding-left: 32px; }
+.stop-line .gap::before { top: 0; bottom: 0; height: auto; background: repeating-linear-gradient(to bottom, #c60c30 0 5px, transparent 5px 10px); }
+.stop-gap-label { color: var(--muted); font-size: 0.9rem; font-style: italic; }
+.stop-toggle { width: auto; min-height: 44px; padding: 0 16px; font-size: 0.95rem; align-self: flex-start; }
 
 /* ---------- Alerts ---------- */
 .segmented { display: grid; grid-template-columns: 1fr 1fr; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 4px; }
@@ -586,3 +591,16 @@ select { min-height: 44px; padding: 0 10px; border-radius: 10px; border: 1px sol
   border-bottom: 2px solid var(--warn);
 }
 .offline-banner svg { flex-shrink: 0; }
+
+/* ---------- Arrival alert ---------- */
+/* Pinned to the top so it's seen wherever the rider has scrolled to. */
+.arrival-alert-region { position: sticky; top: 8px; z-index: 10; }
+.arrival-alert {
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px 16px; border-radius: var(--radius);
+  background: var(--ok-bg); color: var(--ok); border: 2px solid var(--ok);
+  box-shadow: 0 6px 20px rgb(0 0 0 / 0.18);
+}
+.arrival-alert-text { flex: 1; color: var(--text); }
+.arrival-alert-title { font-weight: 800; font-size: 1.15rem; color: var(--ok); }
+.arrival-alert-dismiss { width: auto; min-height: 44px; padding: 0 14px; font-size: 0.95rem; }

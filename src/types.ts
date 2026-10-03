@@ -40,6 +40,8 @@ export interface RouteStep {
   lat?: number;
   lng?: number;
   heading?: number;
+  /** Entrance elevator whose saved photo can stand in when live Street View is unavailable. */
+  cachedViewId?: string;
 }
 
 export interface TripLeg {
