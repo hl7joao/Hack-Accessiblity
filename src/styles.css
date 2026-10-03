@@ -352,7 +352,7 @@ select { min-height: 44px; padding: 0 10px; border-radius: 10px; border: 1px sol
 
 /* ---------- 360 entrance panorama ---------- */
 
-.pano { margin: 0 0 1rem; }
+.pano { margin: 0 0 1rem; max-width: 100%; min-width: 0; }
 
 .pano-frame {
   position: relative;
@@ -372,6 +372,9 @@ select { min-height: 44px; padding: 0 10px; border-radius: 10px; border: 1px sol
   justify-content: space-between;
   gap: 0.5rem;
   padding: 0.5rem 0;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 .pano-heading {
   flex: 1;
@@ -379,20 +382,26 @@ select { min-height: 44px; padding: 0 10px; border-radius: 10px; border: 1px sol
   font-size: calc(0.9rem * var(--font-scale, 1));
   color: var(--muted);
   text-transform: capitalize;
-  /* Keep the label on one line so it doesn't squeeze the buttons at large
-     text sizes; it's announced via aria-live regardless of how it wraps. */
+  /* Truncate rather than wrap: it's announced via aria-live regardless of how
+     it displays, so the visible label must never push the buttons off-screen. */
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  min-width: 0;
 }
 
-.pano-controls .btn-sm { flex: 0 0 auto; }
+/* Buttons may shrink, but never below a usable tap target, and never past the
+   edge of the frame. */
+.pano-controls .btn-sm { flex: 0 1 auto; min-width: 0; }
 .pano-controls .btn-sm:disabled { opacity: 0.55; cursor: not-allowed; }
 
 .btn-sm {
   padding: 0.4rem 0.7rem;
   font-size: calc(0.85rem * var(--font-scale, 1));
   min-height: 44px;             /* keeps the touch target usable with limited dexterity */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .pano-date { color: var(--muted); }
