@@ -81,6 +81,34 @@ MBTA is the only US agency that solved this — by **leaving the standard** and 
 | [docs/candidates.md](docs/candidates.md) | Ideas we considered and scored, with reasons we rejected some. |
 | [docs/decision-framework.md](docs/decision-framework.md) | How we chose, and our automatic disqualifiers. |
 
+## Run the app
+
+A mobile web app (Vite + React + TypeScript) in `src/`. It runs on mock data by default, so
+you need no keys to start.
+
+```bash
+pnpm install
+pnpm dev
+```
+
+Open it at phone width. To use live data, copy `.env.example` to `.env` and set
+`VITE_USE_MOCKS=false`. CTA endpoints don't allow browser CORS, so `vite.config.ts` proxies
+them (`/api/cta/*` for alerts, `/api/traintracker/*` for Train Tracker with the key added
+server-side). Production needs the same two routes in a small backend.
+
+| Screen | Path | Code |
+|---|---|---|
+| Home: destination search, elevator alert banner | `/` | `src/screens/Home.tsx` |
+| Route options, step-free first | `/plan?to=` | `src/screens/PlanTrip.tsx` |
+| Station guide: entrance to platform | `/trip` | `src/screens/StationGuide.tsx` |
+| Platform: next-train countdown, arrival alert | `/trip/platform` | `src/screens/Platform.tsx` |
+| On board: stops remaining, "your stop is next" | `/trip/ride` | `src/screens/Ride.tsx` |
+| Exit route | `/trip/arrive` | `src/screens/Arrive.tsx` |
+| Elevator alerts | `/alerts` | `src/screens/Alerts.tsx` |
+| Accessibility preferences | `/settings` | `src/screens/Settings.tsx` |
+
+API clients live in `src/services/`; mock data in `src/data/mock.ts`.
+
 ## API keys
 
 **You probably need none.** Everything accessibility-critical is open:

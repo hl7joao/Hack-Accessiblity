@@ -7,3 +7,5 @@ build/
 .DS_Store
 .vite/
 coverage/
+.pnpm-store/
+*.tsbuildinfo
