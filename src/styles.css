@@ -119,6 +119,9 @@ svg { flex-shrink: 0; vertical-align: middle; }
 }
 
 .hero { padding-top: 16px; }
+.station-header { padding: 16px 0 4px; }
+.station-header h1 { font-size: 2.4rem; font-weight: 800; line-height: 1.05; letter-spacing: -0.02em; overflow-wrap: anywhere; }
+.station-header-sub { margin-top: 8px; font-size: 1.1rem; font-weight: 600; color: var(--muted); }
 .eyebrow { color: var(--primary); font-weight: 700; font-size: 0.85rem; letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 4px; }
 
 /* ---------- Cards & lists ---------- */
@@ -224,6 +227,15 @@ svg { flex-shrink: 0; vertical-align: middle; }
 .step-body { flex: 1; padding-top: 10px; display: flex; flex-direction: column; gap: 4px; }
 .step-title { font-weight: 650; font-size: 1.05rem; }
 .step-elevator { display: flex; flex-direction: column; gap: 4px; align-items: flex-start; margin-top: 2px; }
+.step-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; margin-top: 8px; }
+.step-card-head { display: flex; align-items: center; gap: 12px; }
+.step-icon-current { background: var(--primary); color: var(--primary-text); border-color: var(--primary); }
+.step-group { font-size: 0.8rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; color: var(--primary); }
+.step-count { font-weight: 700; color: var(--muted); }
+.step-card .step-body { padding-top: 12px; }
+.step-nav { display: flex; gap: 12px; margin-top: 12px; }
+.step-nav .btn { flex: 1; padding: 0 12px; }
+.step-nav .btn[aria-disabled='true'] { opacity: 0.55; cursor: default; }
 
 /* ---------- Platform ---------- */
 .next-train { display: flex; flex-direction: column; gap: 4px; }

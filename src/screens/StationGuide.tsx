@@ -1,14 +1,10 @@
 import { Link } from 'react-router-dom';
-import { ScreenHeader } from '../components/AppShell';
-import { SatelliteMap } from '../components/SatelliteMap';
 import { Icon } from '../components/Icon';
 import { PlanBCard } from '../components/PlanBCard';
-import { StationVerdictCard } from '../components/StationVerdict';
-import { StepList } from '../components/StepList';
-import { StreetViewPanorama } from '../components/StreetViewPanorama';
-import { WalkingPathView } from '../components/WalkingPathView';
+import { StepByStep } from '../components/StepByStep';
 import { TripProgress } from '../components/TripProgress';
 import { useTrip } from '../context/Trip';
+import type { RouteStep } from '../types';
 import { findAlternatives } from '../services/planB';
 import { STATIONS } from '../data/mock';
 import { useStationStatus } from '../services/useStationStatus';
@@ -25,11 +21,22 @@ export function StationGuide() {
 
   if (!trip || !leg) return <NoTrip />;
 
-  // Point the 360 view at the entrance the rider should actually use: the first
-  // working street-level elevator. When one is out, this is what changes - and it's
-  // the difference between arriving at the right door and arriving at a dead end.
+  // Guide the rider to the entrance they should actually use: the first working
+  // street-level elevator. When one is out, this is what changes - and it's the
+  // difference between arriving at the right door and arriving at a dead end.
   const entranceElevator = status?.elevators.find((e) => !e.isOut && e.spec.entrance);
   const entrance = entranceElevator?.spec.entrance;
+
+  // The walk up to that entrance comes first in the directions, so the rider follows
+  // one sequence from the street to the platform.
+  const approachSteps: RouteStep[] = (entrance ? entranceElevator?.spec.approach ?? [] : []).map((p, i) => ({
+    id: `approach-${i}`,
+    kind: 'walk',
+    title: p.instruction,
+    lat: p.lat,
+    lng: p.lng,
+    heading: p.heading,
+  }));
 
   // When the station can't be used, lead with somewhere that can be.
   const stranded = status?.verdict === 'unusable' || status?.verdict === 'not-accessible';
@@ -44,11 +51,14 @@ export function StationGuide() {
 
   return (
     <div className="screen">
-      <ScreenHeader title={`${leg.from.name} station`} subtitle={`Get to the ${leg.toward}-bound platform`} />
+      {/* The station name is the one thing the rider must match against signage, so it leads. */}
+      <header className="station-header">
+        <p className="eyebrow">Your station</p>
+        <h1>{leg.from.name}</h1>
+        <p className="station-header-sub">Get to the {leg.toward}-bound platform</p>
+      </header>
       <TripProgress stage={0} />
 
-      {/* The verdict leads: whether the station works at all decides everything below it. */}
-      {status && <StationVerdictCard status={status} />}
       {stranded && <PlanBCard alternatives={alternatives} />}
 
       {/* Warn about the destination before they board, not after they arrive. */}
@@ -68,25 +78,12 @@ export function StationGuide() {
         </p>
       )}
 
-      {entrance && (
-        <section aria-labelledby="entrance-h">
-          <h2 id="entrance-h" className="section-title">Look for this entrance</h2>
-          <StreetViewPanorama
-            lat={entrance.lat}
-            lng={entrance.lng}
-            heading={entrance.heading}
-            description={entrance.name}
-            elevatorId={entranceElevator?.spec.id}
-          />
-        </section>
-      )}
-
-      {entranceElevator?.spec.approach && entrance && (
-        <WalkingPathView points={entranceElevator.spec.approach} destination={entrance.name} />
-      )}
-
-      <SatelliteMap lat={leg.from.lat} lng={leg.from.lng} label={`${leg.from.name} station entrance`} />
-      <StepList steps={trip.originSteps} current={0} />
+      <StepByStep
+        groups={[
+          { title: entrance ? `To the ${entrance.name}` : 'To the station', steps: approachSteps },
+          { title: 'Through the station', steps: trip.originSteps },
+        ]}
+      />
       <div className="sticky-actions">
         <Link to="/trip/platform" className="btn btn-primary">I'm on the platform</Link>
       </div>
