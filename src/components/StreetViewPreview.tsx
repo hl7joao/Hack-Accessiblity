@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { hasMapsKey, streetViewMeta, streetViewUrl } from '../services/googleMaps';
+import { hasMapsKey, isGoogleImagery, streetViewMeta, streetViewUrl } from '../services/googleMaps';
 import { cachedEntrance, cachedViewFor } from '../services/streetViewCache';
 
 /**
@@ -30,7 +30,7 @@ export function StreetViewPreview({
     let cancelled = false;
     setLive('checking');
     streetViewMeta(lat, lng).then((m) => {
-      if (!cancelled) setLive(m.status === 'OK' ? 'ok' : 'unavailable');
+      if (!cancelled) setLive(isGoogleImagery(m) ? 'ok' : 'unavailable');
     });
     return () => {
       cancelled = true;

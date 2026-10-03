@@ -7,6 +7,7 @@ import {
   type StreetViewMeta,
 } from '../services/googleMaps';
 import { cachedEntrance, cachedHeadings, cachedViewFor } from '../services/streetViewCache';
+import { isGoogleImagery } from '../services/googleMaps';
 
 /**
  * Drag-to-look-around 360 view of a station entrance.
@@ -74,7 +75,7 @@ export function StreetViewPanorama({
   };
 
   const noKey = !hasMapsKey();
-  const noCoverage = Boolean(meta && meta.status !== 'OK');
+  const noCoverage = Boolean(meta && !isGoogleImagery(meta)); // non-Google panos fall back to hand-vetted cached stills
   // While metadata is still in flight we don't yet know whether live imagery works.
   // Prefer the cached still in that window rather than showing a spinner: a rider at
   // a station entrance needs the picture now, and swapping to live once it confirms

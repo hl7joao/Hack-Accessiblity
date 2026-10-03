@@ -81,7 +81,7 @@ export const TRIP_OPTIONS: TripOption[] = [
 ];
 
 const ORIGIN_STEPS: TripOption['originSteps'] = [
-  { id: 'o1', kind: 'enter', title: 'Enter at State St & Roosevelt Rd', detail: 'Northeast corner, glass elevator building. Automatic door on the left.', lat: 41.86745, lng: -87.62705, heading: 270, cachedViewId: 'elev-41400-state' },
+  { id: 'o1', kind: 'enter', title: 'Enter at State St & Roosevelt Rd', detail: 'Northeast corner, glass elevator building. Automatic door on the left.', lat: 41.86748, lng: -87.62708, heading: 60, cachedViewId: 'elev-41400-state' },
   { id: 'o2', kind: 'elevator', title: 'Take elevator down to mezzanine', elevatorId: 'roos-street' },
   { id: 'o3', kind: 'fare', title: 'Use the wide accessible fare gate', detail: 'Far right gate. Tap Ventra card or phone on the reader at seat height.' },
   { id: 'o4', kind: 'walk', title: 'Follow the red signs 40 ft ahead', detail: 'Level floor, tactile strip guides you to the elevator.' },
@@ -99,7 +99,7 @@ TRIP_OPTIONS[0].destinationSteps = [
 TRIP_OPTIONS[1].destinationSteps = [
   { id: 'd1', kind: 'exit', title: 'Exit at front of train', detail: 'Elevator is directly ahead.' },
   { id: 'd2', kind: 'elevator', title: 'Elevator to Fullerton Ave', elevatorId: 'full-plat' },
-  { id: 'd3', kind: 'walk', title: 'Bus #77 stop is 50 ft east', detail: 'Curb cut at the corner. Bus has a ramp at the front door.', lat: 41.92505, lng: -87.6522, heading: 90 },
+  { id: 'd3', kind: 'walk', title: 'Bus #77 stop is 50 ft east', detail: 'Curb cut at the corner. Bus has a ramp at the front door.' },
 ];
 
 export function mockArrivals(stationId: string): Arrival[] {

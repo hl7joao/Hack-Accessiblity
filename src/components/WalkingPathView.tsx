@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { hasMapsKey, streetViewMeta, streetViewUrl } from '../services/googleMaps';
+import { hasMapsKey, isGoogleImagery, streetViewMeta, streetViewUrl } from '../services/googleMaps';
 
 export interface PathPoint {
   lat: number;
@@ -31,7 +31,7 @@ export function WalkingPathView({ points, destination }: { points: PathPoint[]; 
     let cancelled = false;
     // Free metadata calls — check coverage before spending image quota.
     Promise.all(points.map((p) => streetViewMeta(p.lat, p.lng))).then((metas) => {
-      if (!cancelled) setCoverage(metas.map((m) => m.status === 'OK'));
+      if (!cancelled) setCoverage(metas.map((m) => isGoogleImagery(m)));
     });
     return () => {
       cancelled = true;

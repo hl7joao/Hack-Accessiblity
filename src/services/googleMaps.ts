@@ -109,6 +109,16 @@ export function streetViewMeta(lat: number, lng: number, radius = 50): Promise<S
   return p;
 }
 
+/**
+ * Only Google-captured imagery is usable for guidance. User photospheres pass the
+ * same metadata check but can be indoors, years old, or pointed at anything — we
+ * shipped a step that said "Bus #77 stop is 50 ft east" over a photo of framed
+ * artwork on a gallery wall ("© Mass Interact") before this guard existed.
+ */
+export function isGoogleImagery(meta: StreetViewMeta): boolean {
+  return meta.status === 'OK' && /google/i.test(meta.copyright ?? '');
+}
+
 /** How stale is this imagery? Entrances get rebuilt; riders need to know. */
 export function imageryAgeMonths(meta: StreetViewMeta): number | null {
   if (!meta.date) return null;
