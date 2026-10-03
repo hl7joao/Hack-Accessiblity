@@ -4,6 +4,7 @@ import { SatelliteMap } from '../components/SatelliteMap';
 import { StationVerdictCard } from '../components/StationVerdict';
 import { StepList } from '../components/StepList';
 import { StreetViewPanorama } from '../components/StreetViewPanorama';
+import { WalkingPathView } from '../components/WalkingPathView';
 import { TripProgress } from '../components/TripProgress';
 import { useTrip } from '../context/Trip';
 import { useStationStatus } from '../services/useStationStatus';
@@ -47,6 +48,10 @@ export function StationGuide() {
             elevatorId={entranceElevator?.spec.id}
           />
         </section>
+      )}
+
+      {entranceElevator?.spec.approach && entrance && (
+        <WalkingPathView points={entranceElevator.spec.approach} destination={entrance.name} />
       )}
 
       <SatelliteMap lat={leg.from.lat} lng={leg.from.lng} label={`${leg.from.name} station entrance`} />

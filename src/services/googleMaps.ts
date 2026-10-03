@@ -82,11 +82,9 @@ export function streetViewMeta(lat: number, lng: number, radius = 50): Promise<S
   const cached = metaCache.get(key);
   if (cached) return cached;
 
-  if (!hasMapsKey()) {
-    const none = Promise.resolve<StreetViewMeta>({ status: 'REQUEST_DENIED' });
-    metaCache.set(key, none);
-    return none;
-  }
+  // Don't cache a no-key answer: the key can arrive later (env change, new deploy),
+  // and a cached REQUEST_DENIED would keep claiming "no coverage" forever after.
+  if (!hasMapsKey()) return Promise.resolve<StreetViewMeta>({ status: 'REQUEST_DENIED' });
 
   const params = new URLSearchParams({
     location: `${lat},${lng}`,
@@ -96,7 +94,16 @@ export function streetViewMeta(lat: number, lng: number, radius = 50): Promise<S
   });
   const p = fetch(`https://maps.googleapis.com/maps/api/streetview/metadata?${params}`)
     .then((r) => r.json() as Promise<StreetViewMeta>)
-    .catch(() => ({ status: 'NOT_FOUND' }) as StreetViewMeta);
+    .then((m) => {
+      // Only a definitive answer is worth keeping. Denials and quota errors are
+      // transient - caching them would outlive the condition that caused them.
+      if (m.status === 'REQUEST_DENIED' || m.status === 'OVER_QUERY_LIMIT') metaCache.delete(key);
+      return m;
+    })
+    .catch(() => {
+      metaCache.delete(key);
+      return { status: 'NOT_FOUND' } as StreetViewMeta;
+    });
 
   metaCache.set(key, p);
   return p;

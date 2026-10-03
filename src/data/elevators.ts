@@ -53,6 +53,15 @@ export interface ElevatorSpec {
   redundantWith?: string[];
   /** Nearest street entrance, for Street View and walking directions. */
   entrance?: { lat: number; lng: number; heading?: number; name: string };
+  /**
+   * Approach to this entrance, one point per decision.
+   *
+   * Hand-authored because CTA's own KML says station coordinates are the facility,
+   * not the entrance - so "you have arrived" from a normal map app can leave a
+   * wheelchair user at a stair-only door with the elevator around the corner.
+   * Each point is checked for Street View coverage before being added.
+   */
+  approach?: { lat: number; lng: number; heading: number; instruction: string }[];
 }
 
 export const ELEVATOR_REGISTRY: ElevatorSpec[] = [
@@ -84,6 +93,11 @@ export const ELEVATOR_REGISTRY: ElevatorSpec[] = [
     matchers: ['to/from state street at roosevelt'],
     redundantWith: ['elev-41400-wabash'],
     entrance: { lat: 41.86728, lng: -87.62667, heading: 90, name: 'State St entrance' },
+    approach: [
+      { lat: 41.867, lng: -87.62667, heading: 0, instruction: 'Head north on State Street toward Roosevelt Road.' },
+      { lat: 41.86728, lng: -87.627, heading: 90, instruction: 'Cross to the east side of State Street at the light.' },
+      { lat: 41.86728, lng: -87.62667, heading: 90, instruction: 'The elevator entrance is on your right, set back from the sidewalk.' },
+    ],
   },
   {
     id: 'elev-41400-wabash',
@@ -139,6 +153,10 @@ export const ELEVATOR_REGISTRY: ElevatorSpec[] = [
     segment: 'street-to-mezzanine',
     matchers: ['to/from street at clark/lake', 'street elevator at clark/lake'],
     entrance: { lat: 41.88574, lng: -87.63098, heading: 180, name: 'Lake St entrance' },
+    approach: [
+      { lat: 41.88574, lng: -87.6315, heading: 90, instruction: 'Head east on Lake Street toward Clark Street.' },
+      { lat: 41.88574, lng: -87.63098, heading: 180, instruction: 'The station entrance is under the elevated tracks, on your right.' },
+    ],
   },
   {
     id: 'elev-40380-subway',
@@ -183,6 +201,10 @@ export const ELEVATOR_REGISTRY: ElevatorSpec[] = [
     segment: 'street-to-mezzanine',
     matchers: ['to/from street at belmont', 'street elevator at belmont'],
     entrance: { lat: 41.93942, lng: -87.65312, heading: 270, name: 'Belmont Ave entrance' },
+    approach: [
+      { lat: 41.93942, lng: -87.6525, heading: 270, instruction: 'Head west on Belmont Avenue toward the station.' },
+      { lat: 41.93942, lng: -87.65312, heading: 270, instruction: 'The station house is ahead under the tracks. The elevator is inside, to the left of the fare gates.' },
+    ],
   },
   {
     id: 'elev-41320-north',
