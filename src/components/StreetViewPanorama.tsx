@@ -75,10 +75,15 @@ export function StreetViewPanorama({
 
   const noKey = !hasMapsKey();
   const noCoverage = Boolean(meta && meta.status !== 'OK');
-  const liveUnavailable = noKey || noCoverage;
+  // While metadata is still in flight we don't yet know whether live imagery works.
+  // Prefer the cached still in that window rather than showing a spinner: a rider at
+  // a station entrance needs the picture now, and swapping to live once it confirms
+  // is invisible to them.
+  const liveUnconfirmed = !noKey && !meta;
+  const liveUnavailable = noKey || noCoverage || liveUnconfirmed;
 
   // Fall back to the committed stills so the entrance view still works with no key,
-  // no quota and no network. Live imagery wins when it's available.
+  // a dead key (expired billing, revoked, over quota), no coverage, or no network.
   const cached = elevatorId ? cachedEntrance(elevatorId) : undefined;
   const cachedView = elevatorId && liveUnavailable ? cachedViewFor(elevatorId, angle) : undefined;
   const usingCache = Boolean(cachedView);
