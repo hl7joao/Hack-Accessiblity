@@ -140,3 +140,54 @@ stations closed for reconstruction, excluded from the active feed. **State which
 
 The city portal (`8pix-ypme`) is STALE: it flags Austin Green (41260) and Racine Blue
 (40470) as `ada: false` though both are completed ASAP projects. **Prefer GTFS.**
+
+## Prior art — fuller picture (third pass)
+
+The space is NOT empty. Corrections to the earlier "nothing exists" read:
+
+- **EL Tracker** (iOS, v4.6, Sept 2026, 4.92★/83 reviews) is **live and maintained**, with
+  elevator-outage push notifications AND VoiceOver support. This is a real competitor.
+  **Critical gap from its own reviews: *"It won't help people who need navigation help"* —
+  it alerts, it does not route.** That gap is our opening.
+- **Elevate Chicago** (Loyola students) — **DEAD.** Delisted from both stores, repo last
+  pushed Nov 2022.
+- **Elevator Uptime** (elevatoruptime.com) tracks 83 CTA stations and its station list is
+  **visibly corrupted by prose parsing**: `"Ashland is"`, `"Racine is"`, triplicate
+  `"35th-Bronzeville"`/`"35th-Bronzville"`/`"35th-Bronzeville-IIT"`.
+  **Live empirical proof that naive text-scraping fails.** Station-level only.
+- **UnlockedMaps** (academic, W4A '23) covered Chicago — **API now returns HTTP 502.**
+  Its paper admits: *"none of them provide the data on past elevator outages to the public."*
+- **Chi Hack Night has no accessibility/elevator/ADA project** at all.
+- **Google's wheelchair-accessible transit** launched 2018 in London/NYC/Tokyo/Mexico City/
+  Boston/Sydney — **Chicago not included.** Google's spec page lists `levels.txt` as
+  UNSUPPORTED. Apple's iOS 27 transit guide: zero occurrences of "wheelchair"/"elevator"/
+  "step-free". Transit App concedes: *"GTFS only has static wheelchair data. But what if
+  an elevator at a station breaks...?"* — future work.
+
+## Why this is structurally impossible to fix via the standard
+
+- **GTFS-rt `EntitySelector` has exactly 6 fields** (`agency_id`, `route_id`, `route_type`,
+  `trip`, `stop_id`, `direction_id`) — **no `pathway_id`.** An elevator outage is
+  *literally not addressable* in the spec.
+- [google/transit#268](https://github.com/google/transit/issues/268) — "extend
+  EntitySelector to select pathways" — **open since April 2021.** 5+ years.
+- **Pathways adoption is ~0.4% industry-wide**: ~18 of ~4,550 GTFS feeds. CTA is not
+  among them. **Neither is NYC MTA.**
+- **MBTA is the one agency that solved it — by leaving the standard.** Ships
+  `pathways.txt`, `levels.txt` AND **`facilities.txt`** (per-elevator IDs), emitting
+  `"effect":"ELEVATOR_CLOSURE"` with `"facility":"997"`. All non-standard extensions,
+  invented precisely because `EntitySelector` has no `pathway_id`.
+  **This is the model to copy.**
+
+## New lead to check on day one
+
+**`https://transitdata.transitchicago.com/`** — a newer **beta GTFS-RT portal**, serving
+ServiceAlerts/TripUpdates/VehiclePositions as `.pb` and `.json`. **Key required.**
+Registered in no public feed registry (not Mobility Database, not Transitland).
+⚠️ Contents unverified — the portal page mentions "elevator" **zero times**.
+Check it, but **do not assume it carries elevator data.**
+
+## Verified: the `accessibility` param does what it says
+
+`accessibility=false` dropped the result count 45 → 42, removing **exactly** the 3
+elevator alerts. Clean filter.
