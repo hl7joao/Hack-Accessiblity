@@ -16,8 +16,8 @@
  *    already shows "last confirmed N minutes ago" from the payload's own timestamp.
  */
 
-const SHELL = 'stepfree-shell-v1';
-const DATA = 'stepfree-data-v1';
+const SHELL = 'stepfree-shell-v2';
+const DATA = 'stepfree-data-v2';
 
 // Everything needed to render the app with no network. Hashed asset filenames are
 // added opportunistically on first fetch rather than listed here, since they change
