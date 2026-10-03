@@ -7,8 +7,12 @@
  *
  * Two strategies, chosen per resource:
  *
- *  - App shell and cached entrance photos: cache-first. They change only on deploy,
- *    so serving them instantly from disk is both faster and offline-proof.
+ *  - Pages (index.html): network-first. The page names the current build's hashed
+ *    bundles, so serving a cached copy first would pin every returning visitor to
+ *    the old app forever - deploys would never reach them.
+ *
+ *  - Hashed bundles and cached entrance photos: cache-first. Their contents never
+ *    change under the same URL, so serving them from disk is safe and offline-proof.
  *
  *  - CTA elevator data: network-first, falling back to the last response. Fresh data
  *    always wins, because a stale "elevator working" can strand someone. But a stale
@@ -16,8 +20,9 @@
  *    already shows "last confirmed N minutes ago" from the payload's own timestamp.
  */
 
-const SHELL = 'stepfree-shell-v1';
-const DATA = 'stepfree-data-v1';
+// Bump to discard caches from older builds on every phone that has visited.
+const SHELL = 'stepfree-shell-v2';
+const DATA = 'stepfree-data-v2';
 
 // Everything needed to render the app with no network. Hashed asset filenames are
 // added opportunistically on first fetch rather than listed here, since they change
@@ -72,7 +77,24 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Everything else (app shell, JS/CSS bundles, cached entrance photos): cache-first,
+  // Pages: network-first, so a new deploy is picked up on the next visit. The cached
+  // copy is only for when there's no network.
+  if (request.mode === 'navigate') {
+    event.respondWith(
+      fetch(request)
+        .then((res) => {
+          if (res.ok) {
+            const copy = res.clone();
+            caches.open(SHELL).then((c) => c.put('/index.html', copy));
+          }
+          return res;
+        })
+        .catch(async () => (await caches.match('/index.html')) ?? (await caches.match('/')) ?? Response.error()),
+    );
+    return;
+  }
+
+  // Everything else (JS/CSS bundles, cached entrance photos): cache-first,
   // then fill the cache on the way past.
   event.respondWith(
     caches.match(request).then(

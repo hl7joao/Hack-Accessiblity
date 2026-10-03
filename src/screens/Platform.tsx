@@ -130,7 +130,7 @@ export function Platform() {
           // itself, and an awaited permission prompt that never settles must not stop
           // the alert from turning on.
           if (!watching) {
-            if (prefs.announceAloud) primeSpeech();
+            if (prefs.announceAloud) primeSpeech("Arrival alert on. We'll tell you when your train is arriving.", prefs.voicePace);
             void requestNotificationPermission();
           }
           notified.current = false;
