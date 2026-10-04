@@ -1,4 +1,6 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { CameraWayfinder } from '../components/CameraWayfinder';
 import { Icon } from '../components/Icon';
 import { PlanBCard } from '../components/PlanBCard';
 import { StepByStep } from '../components/StepByStep';
@@ -18,6 +20,8 @@ export function StationGuide() {
   // ENTER a station costs a detour; being unable to EXIT one strands you there.
   const dest = trip?.legs[trip.legs.length - 1]?.to;
   const { status: destStatus } = useStationStatus(dest?.id, dest?.name ?? '', dest?.accessible ?? true);
+
+  const [arOpen, setArOpen] = useState(false);
 
   if (!trip || !leg) return <NoTrip />;
 
@@ -78,6 +82,27 @@ export function StationGuide() {
           Couldn't reach CTA for elevator status. Don't assume elevators are working —
           check the station signage or call 1-888-YOUR-CTA.
         </p>
+      )}
+
+      {/* Live camera directions to the entrance. Offered above the written steps
+          because a rider standing outside wants "which way", not a list to read. */}
+      {entrance && (
+        <button className="btn btn-primary btn-ar" onClick={() => setArOpen(true)}>
+          <Icon name="route" size={20} /> Point me to the {entrance.name}
+        </button>
+      )}
+
+      {arOpen && entrance && (
+        <CameraWayfinder
+          target={{ lat: entrance.lat, lng: entrance.lng }}
+          label={entrance.name}
+          status={
+            entranceElevator
+              ? { text: entranceElevator.isOut ? 'Elevator out of service' : 'Elevator working', ok: !entranceElevator.isOut }
+              : undefined
+          }
+          onClose={() => setArOpen(false)}
+        />
       )}
 
       <StepByStep

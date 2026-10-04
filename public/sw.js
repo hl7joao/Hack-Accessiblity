@@ -21,13 +21,21 @@
  */
 
 // Bump to discard caches from older builds on every phone that has visited.
-const SHELL = 'stepfree-shell-v2';
-const DATA = 'stepfree-data-v2';
+const SHELL = 'stepfree-shell-v3';
+const DATA = 'stepfree-data-v3';
 
 // Everything needed to render the app with no network. Hashed asset filenames are
 // added opportunistically on first fetch rather than listed here, since they change
 // every build.
-const SHELL_URLS = ['/', '/index.html', '/manifest.webmanifest'];
+const SHELL_URLS = [
+  '/',
+  '/index.html',
+  '/manifest.webmanifest',
+  // Home-screen icons: an installed app that loses its icon offline looks broken.
+  '/icons/icon-192.png',
+  '/icons/icon-512.png',
+  '/icons/apple-touch-icon.png',
+];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
