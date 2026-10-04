@@ -687,3 +687,41 @@ select { min-height: 44px; padding: 0 10px; border-radius: 10px; border: 1px sol
 :root[data-contrast='high'] .arview-overlay { background: rgb(0 0 0 / 0.88); }
 :root[data-contrast='high'] .arview-note,
 :root[data-contrast='high'] .arview-status { background: #000; outline: 1px solid #fff; }
+
+/* Why we can't locate you, next to the symptom rather than under a scrim. */
+.arview-blocked {
+  max-width: 34ch;
+  margin: 8px auto 0;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: rgb(0 0 0 / 0.72);
+  font-size: 1rem;
+  line-height: 1.4;
+  color: #ffd9c4;
+}
+
+/* Diagnostics: deliberately plain, and collapsed by default. */
+.arview-diag-toggle {
+  align-self: flex-start;
+  min-height: 44px;
+  padding: 0 12px;
+  border: 1px solid rgb(255 255 255 / 0.45);
+  border-radius: 10px;
+  background: rgb(0 0 0 / 0.55);
+  color: #fff;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+.arview-diag {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 2px 12px;
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: rgb(0 0 0 / 0.78);
+  font-size: 0.82rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+.arview-diag dt { color: #9fb6d4; }
+.arview-diag dd { margin: 0; color: #fff; overflow-wrap: anywhere; }

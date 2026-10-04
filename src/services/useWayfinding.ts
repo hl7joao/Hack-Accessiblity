@@ -19,6 +19,13 @@ export interface WayfindingState {
   relative: number | null;
   instruction: string | null;
   error: string | null;
+  /** GeolocationPositionError.code, for diagnostics. */
+  errorCode: number | null;
+  /** The browser's own message, which often names the real cause. */
+  rawError: string | null;
+  /** Which orientation event actually fired — tells us if the compass is alive. */
+  orientationSource: string | null;
+  fixCount: number;
 }
 
 /**
@@ -39,6 +46,10 @@ export function useWayfinding(target: Coords | null, active: boolean): Wayfindin
     relative: null,
     instruction: null,
     error: null,
+    errorCode: null,
+    rawError: null,
+    orientationSource: null,
+    fixCount: 0,
   });
 
   const smoothed = useRef<number | null>(null);
@@ -52,6 +63,16 @@ export function useWayfinding(target: Coords | null, active: boolean): Wayfindin
       return;
     }
 
+    // Browsers silently refuse location on insecure origins. Over wifi to a dev
+    // server this looks identical to "permission denied", so name it explicitly.
+    if (!window.isSecureContext) {
+      setState((s) => ({
+        ...s,
+        error: 'Location needs a secure (https) connection. Open the deployed site, not a local address.',
+      }));
+      return;
+    }
+
     const watchId = navigator.geolocation.watchPosition(
       (pos) => {
         if (cancelled) return;
@@ -62,26 +83,36 @@ export function useWayfinding(target: Coords | null, active: boolean): Wayfindin
           accuracy: pos.coords.accuracy,
           distanceM: distanceMeters(position, target),
           error: null,
+          errorCode: null,
+          rawError: null,
+          fixCount: s.fixCount + 1,
         }));
       },
       (err) => {
         if (cancelled) return;
         const message =
           err.code === err.PERMISSION_DENIED
-            ? 'Location is off, so we can’t point you. Turn it on in your browser settings.'
+            ? 'Location is blocked. On iPhone: Settings › Privacy › Location Services, and allow it for Safari. Then reload.'
             : err.code === err.POSITION_UNAVAILABLE
-              ? 'No location signal here — this is common underground.'
-              : 'Still finding your location…';
-        setState((s) => ({ ...s, error: message }));
+              ? 'No location signal here — common underground or indoors.'
+              : 'Still finding your location… this can take a few seconds outdoors.';
+        setState((s) => ({
+          ...s,
+          error: message,
+          // A timeout is not a dead end; watchPosition keeps trying.
+          errorCode: err.code,
+          rawError: err.message || null,
+        }));
       },
       { enableHighAccuracy: true, maximumAge: 2_000, timeout: 15_000 },
     );
 
     const onOrientation = (e: DeviceOrientationEvent) => {
       if (cancelled) return;
+      const source = e.type === 'deviceorientationabsolute' ? 'absolute' : e.absolute ? 'alpha(abs)' : 'alpha(rel)';
       const { heading, unreliable } = readHeading(e);
       if (heading == null) {
-        setState((s) => ({ ...s, heading: null, compassUnreliable: true }));
+        setState((s) => ({ ...s, heading: null, compassUnreliable: true, orientationSource: source }));
         return;
       }
       // Circular low-pass: average through the shortest arc so 359° → 1° doesn't
@@ -93,7 +124,7 @@ export function useWayfinding(target: Coords | null, active: boolean): Wayfindin
         const delta = ((heading - prev + 540) % 360) - 180;
         smoothed.current = (prev + delta * 0.25 + 360) % 360;
       }
-      setState((s) => ({ ...s, heading: smoothed.current, compassUnreliable: unreliable }));
+      setState((s) => ({ ...s, heading: smoothed.current, compassUnreliable: unreliable, orientationSource: source }));
     };
 
     window.addEventListener('deviceorientationabsolute', onOrientation as EventListener);

@@ -32,8 +32,11 @@ export function CameraWayfinder({
   const [camera, setCamera] = useState<'idle' | 'on' | 'denied' | 'unsupported'>('idle');
   const [compassAsked, setCompassAsked] = useState(false);
   const { prefs } = usePreferences();
-  const { distanceM, relative, instruction, accuracy, compassUnreliable, error, heading } =
-    useWayfinding(target, true);
+  const {
+    distanceM, relative, instruction, accuracy, compassUnreliable, error, heading,
+    position, errorCode, rawError, orientationSource, fixCount,
+  } = useWayfinding(target, true);
+  const [showDiag, setShowDiag] = useState(false);
 
   const needsCompassPermission =
     typeof (DeviceOrientationEvent as unknown as { requestPermission?: unknown })
@@ -125,8 +128,10 @@ export function CameraWayfinder({
             </span>
           )}
           <p className="arview-instruction">
-            {instruction ?? (compassAsked ? 'Finding your heading…' : 'Finding you…')}
+            {instruction ?? (error ? 'Can’t locate you' : 'Finding you…')}
           </p>
+          {/* The reason belongs next to the symptom, not buried at the bottom. */}
+          {error && !distanceM && <p className="arview-blocked">{error}</p>}
           {distanceM != null && <p className="arview-distance">{formatDistance(distanceM)}</p>}
         </div>
 
@@ -164,7 +169,29 @@ export function CameraWayfinder({
               Camera is off, so you'll just see the arrow. Directions still work.
             </p>
           )}
-          {error && <p className="arview-note arview-error">{error}</p>}
+          {error && distanceM != null && <p className="arview-note arview-error">{error}</p>}
+
+          {/* Diagnostics: turns "it doesn't work" into numbers we can act on. */}
+          <button className="arview-diag-toggle" onClick={() => setShowDiag((v) => !v)}>
+            {showDiag ? 'Hide' : 'Show'} technical details
+          </button>
+          {showDiag && (
+            <dl className="arview-diag">
+              <dt>Secure context</dt><dd>{String(window.isSecureContext)}</dd>
+              <dt>Geolocation API</dt><dd>{'geolocation' in navigator ? 'present' : 'missing'}</dd>
+              <dt>GPS fixes</dt><dd>{fixCount}</dd>
+              <dt>Position</dt>
+              <dd>{position ? `${position.lat.toFixed(5)}, ${position.lng.toFixed(5)}` : 'none'}</dd>
+              <dt>Accuracy</dt><dd>{accuracy != null ? `${Math.round(accuracy)} m` : '—'}</dd>
+              <dt>Error</dt><dd>{errorCode != null ? `code ${errorCode}: ${rawError ?? ''}` : 'none'}</dd>
+              <dt>Compass event</dt><dd>{orientationSource ?? 'never fired'}</dd>
+              <dt>Heading</dt><dd>{heading != null ? `${Math.round(heading)}°` : 'none'}</dd>
+              <dt>Needs iOS permission</dt><dd>{String(needsCompassPermission)}</dd>
+              <dt>Camera</dt><dd>{camera}</dd>
+              <dt>Standalone app</dt>
+              <dd>{String(window.matchMedia('(display-mode: standalone)').matches)}</dd>
+            </dl>
+          )}
         </div>
       </div>
     </div>
